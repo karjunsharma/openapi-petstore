@@ -40,15 +40,27 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
-      - name: Generate open api specifications
-        id: generate-doc
-        uses: ./
-        with:
-          user-name: ${{ secrets.BOT_USERNAME}}
-          user-token: ${{ secrets.BOT_PASSWORD}}
-          user-email: ${{ secrets.BOT_EMAIL}}
-          branch: ${{ steps.extract_branch.outputs.branch }}
+#      - name: Generate open api specifications
+#        id: generate-doc
+#        uses: ./
+#        with:
+#          user-name: ${{ secrets.BOT_USERNAME}}
+#          user-token: ${{ secrets.BOT_PASSWORD}}
+#          user-email: ${{ secrets.BOT_EMAIL}}
+#          branch: ${{ steps.extract_branch.outputs.branch }}
+#
+#      - name: Print the URL for generate documentation
+#        if: steps.generate-doc.outputs.generated-doc-url != ''
+#        run: echo ${{ steps.generate-doc.outputs.generated-doc-url}}
 
-      - name: Print the URL for generate documentation
-        if: steps.generate-doc.outputs.generated-doc-url != ''
-        run: echo ${{ steps.generate-doc.outputs.generated-doc-url}}
+      - name: Generate Swagger UI
+        uses: Legion2/swagger-ui-action@v1
+        with:
+          output: swagger-ui
+          spec-file: openapi/petstore.yaml
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: swagger-ui
