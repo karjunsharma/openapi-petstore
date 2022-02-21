@@ -34,3 +34,17 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Generate open api specifications
+        id: generate-doc
+        uses: ./
+        with:
+          user-name: ${{ secrets.BOT_USERNAME}}
+          user-token: ${{ secrets.BOT_PASSWORD}}
+          user-email: ${{ secrets.BOT_EMAIL}}
+          branch: ${{ steps.extract_branch.outputs.branch }}
